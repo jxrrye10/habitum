@@ -1,0 +1,45 @@
+{% extends 'habits/base.html' %}
+
+{% block title %}{{ titulo }} - Habitum{% endblock %}
+
+{% block content %}
+<div class="main-content">
+
+  <div class="page-header">
+    <h1 class="page-title">{{ titulo }}</h1>
+    <a href="{% url 'dashboard' %}" class="btn-ghost">Cancelar</a>
+  </div>
+
+  <div class="form-card">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert-habitum {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% for field in form %}
+        <div class="mb-4">
+          <label class="form-label">{{ field.label }}</label>
+          {{ field }}
+          {% if field.errors %}
+            {% for error in field.errors %}
+              <div style="color:var(--color-danger);font-size:0.8rem;margin-top:0.25rem;">{{ error }}</div>
+            {% endfor %}
+          {% endif %}
+        </div>
+      {% endfor %}
+      <div class="d-flex gap-2 align-items-center">
+        <button type="submit" class="btn-primary-h">
+          {% if habito %}Guardar cambios{% else %}Crear habito{% endif %}
+        </button>
+        <a href="{% url 'dashboard' %}" class="link-muted">Cancelar</a>
+      </div>
+    </form>
+  </div>
+
+</div>
+{% endblock %}

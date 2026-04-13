@@ -1,0 +1,48 @@
+{% extends 'habits/base.html' %}
+
+{% block title %}Historial - Habitum{% endblock %}
+
+{% block content %}
+<div class="main-content">
+
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Historial</h1>
+      <p class="page-date">Ultimos 30 dias</p>
+    </div>
+    <a href="{% url 'dashboard' %}" class="btn-ghost">Volver a hoy</a>
+  </div>
+
+  {% if dias %}
+    {% for dia in dias %}
+      <div class="historial-day">
+        <div class="historial-day-header">
+          <span class="historial-date">{{ dia.fecha|date:"l j \d\e F" }}</span>
+          <span class="historial-pct {% if dia.porcentaje == 100 %}full{% elif dia.porcentaje > 0 %}partial{% else %}empty{% endif %}">
+            {{ dia.completados }}/{{ dia.total }} &mdash; {{ dia.porcentaje }}%
+          </span>
+        </div>
+        {% if dia.registros %}
+          <div class="historial-habits">
+            {% for registro in dia.registros %}
+              <span class="tag-habit {% if registro.completado %}done{% else %}pending{% endif %}">
+                {{ registro.habito.nombre }}
+              </span>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div style="padding:0.75rem 1.25rem;color:var(--color-muted);font-size:0.85rem;">
+            Sin registros para este dia.
+          </div>
+        {% endif %}
+      </div>
+    {% endfor %}
+  {% else %}
+    <div class="empty-state">
+      <div class="empty-state-title">Sin historial todavia</div>
+      <p style="margin:0;">Vuelve manana para ver tu primer dia registrado.</p>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

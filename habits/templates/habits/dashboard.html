@@ -1,0 +1,108 @@
+
+{% extends 'habits/base.html' %}
+{% load static %}
+
+{% block title %}Hoy - Habitum{% endblock %}
+
+{% block content %}
+<div class="main-content">
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert-habitum {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Buenos dias, {{ user.username }}.</h1>
+      <p class="page-date">{{ hoy|date:"l j \d\e F \d\e Y" }}</p>
+    </div>
+    <a href="{% url 'crear_habito' %}" class="btn-primary-h">+ Nuevo habito</a>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">Completados</div>
+      <div class="stat-value">
+        {{ completados }}<span style="font-size:1rem;color:var(--color-muted);font-family:'DM Sans',sans-serif;">/{{ total }}</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Progreso</div>
+      <div class="stat-value">
+        {{ porcentaje }}<span style="font-size:1rem;color:var(--color-muted);font-family:'DM Sans',sans-serif;">%</span>
+      </div>
+    </div>
+    <div class="stat-card racha-card">
+      <div class="stat-label">Racha actual</div>
+      <div class="stat-value">
+        {{ racha }}<span style="font-size:1rem;font-family:'DM Sans',sans-serif;"> dias</span>
+      </div>
+    </div>
+  </div>
+
+  {% if total > 0 %}
+  <div class="progress-section">
+    <div class="progress-label">
+      <span class="progress-title">Progreso del dia</span>
+      <span class="progress-pct">{{ porcentaje }}%</span>
+    </div>
+    <div class="progress-bar-track">
+      <div class="progress-bar-fill" style="width: {{ porcentaje }}%;"></div>
+    </div>
+    {% if porcentaje == 100 %}
+      <p style="font-size:0.8rem;color:var(--color-done);margin-top:0.5rem;margin-bottom:0;font-weight:600;">
+        Completaste todos tus habitos hoy.
+      </p>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {% if registros_hoy %}
+    <div class="mb-2">
+      <div class="habits-section-title">Habitos de hoy</div>
+      {% for registro in registros_hoy %}
+        <div class="habit-item {% if registro.completado %}done{% else %}pending{% endif %}">
+          <span class="habit-dot {% if registro.completado %}done{% else %}pending{% endif %}"></span>
+          <span class="habit-name {% if registro.completado %}done{% endif %}">{{ registro.habito.nombre }}</span>
+          <span class="habit-status-badge {% if registro.completado %}badge-done{% else %}badge-pending{% endif %}">
+            {% if registro.completado %}Completado{% else %}Pendiente{% endif %}
+          </span>
+          <div class="habit-actions">
+            <form method="post" action="{% url 'marcar_habito' registro.id %}" style="display:inline;">
+              {% csrf_token %}
+              <button type="submit" class="btn-mark {% if registro.completado %}mark-undo{% else %}mark-done{% endif %}">
+                {% if registro.completado %}Desmarcar{% else %}Marcar{% endif %}
+              </button>
+            </form>
+            <a href="{% url 'editar_habito' registro.habito.id %}" class="btn-icon" title="Editar">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+            </a>
+            <a href="{% url 'eliminar_habito' registro.habito.id %}" class="btn-icon del" title="Eliminar">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                <path d="M10 11v6"/><path d="M14 11v6"/>
+                <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <div class="empty-state-title">Sin habitos registrados</div>
+      <p style="margin:0.5rem 0 1.25rem;">Crea tu primer habito para empezar a rastrear tu progreso.</p>
+      <a href="{% url 'crear_habito' %}" class="btn-primary-h">+ Crear primer habito</a>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}
