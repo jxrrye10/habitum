@@ -1,5 +1,11 @@
 from django.contrib import admin
-from .models import Habito, Registro
+from .models import Habito, Registro, Perfil
+
+
+@admin.register(Perfil)
+class PerfilAdmin(admin.ModelAdmin):
+    list_display = ('usuario', 'nombre_personalizado')
+    search_fields = ('usuario__username', 'nombre_personalizado')
 
 
 @admin.register(Habito)

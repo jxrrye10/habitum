@@ -1,0 +1,113 @@
+{% extends 'habits/base.html' %}
+
+{% block title %}{{ usuario_obj.username }} - Admin{% endblock %}
+
+{% block content %}
+<div class="main-content">
+
+  <div class="page-header">
+    <div class="d-flex align-items-center gap-3">
+      {% if perfil.foto %}
+        <img src="{{ perfil.foto.url }}" alt="foto" class="avatar-lg" />
+      {% else %}
+        <img src="https://api.dicebear.com/7.x/initials/svg?seed={{ usuario_obj.username }}&backgroundColor=1a3560&textColor=ffffff&radius=50"
+             alt="avatar" class="avatar-lg" />
+      {% endif %}
+      <div>
+        <h1 class="page-title">{{ perfil.get_nombre }}</h1>
+        <p style="margin:0;font-size:0.85rem;color:var(--color-muted);">
+          @{{ usuario_obj.username }}
+          &middot; {{ usuario_obj.email }}
+          &middot; Registro: {{ usuario_obj.date_joined|date:"d/m/Y" }}
+        </p>
+      </div>
+    </div>
+    <div class="d-flex gap-2">
+      {% if not usuario_obj.is_superuser %}
+        <a href="{% url 'eliminar_usuario' usuario_obj.id %}" class="btn-danger-h">Eliminar usuario</a>
+      {% endif %}
+      <a href="{% url 'lista_usuarios' %}" class="btn-ghost">Volver</a>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">Completados hoy</div>
+      <div class="stat-value">
+        {{ completados }}<span style="font-size:1rem;color:var(--color-muted);font-family:'DM Sans',sans-serif;">/{{ total }}</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Progreso hoy</div>
+      <div class="stat-value">
+        {{ porcentaje }}<span style="font-size:1rem;color:var(--color-muted);font-family:'DM Sans',sans-serif;">%</span>
+      </div>
+    </div>
+    <div class="stat-card racha-card">
+      <div class="stat-label">Racha</div>
+      <div class="stat-value">
+        {{ racha }}<span style="font-size:1rem;font-family:'DM Sans',sans-serif;"> dias</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Progress bar -->
+  {% if total > 0 %}
+  <div class="progress-section">
+    <div class="progress-label">
+      <span class="progress-title">Progreso de hoy</span>
+      <span class="progress-pct">{{ porcentaje }}%</span>
+    </div>
+    <div class="progress-bar-track">
+      <div class="progress-bar-fill" style="width: {{ porcentaje }}%;"></div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Habitos de hoy -->
+  {% if registros_hoy %}
+    <div class="habits-section-title">Habitos de hoy — {{ hoy|date:"d/m/Y" }}</div>
+    {% for registro in registros_hoy %}
+      <div class="habit-item {% if registro.completado %}done{% else %}pending{% endif %}">
+        <span class="habit-dot {% if registro.completado %}done{% else %}pending{% endif %}"></span>
+        <span class="habit-name {% if registro.completado %}done{% endif %}">{{ registro.habito.nombre }}</span>
+        <span class="habit-status-badge {% if registro.completado %}badge-done{% else %}badge-pending{% endif %}">
+          {% if registro.completado %}Completado{% else %}Pendiente{% endif %}
+        </span>
+      </div>
+    {% endfor %}
+  {% else %}
+    <div class="empty-state" style="padding:1.5rem;">
+      <p style="margin:0;color:var(--color-muted);">Este usuario no tiene habitos registrados.</p>
+    </div>
+  {% endif %}
+
+  <!-- Historial 14 dias -->
+  <div class="habits-section-title" style="margin-top:2rem;">Historial ultimos 14 dias</div>
+  {% for dia in dias %}
+    <div class="historial-day">
+      <div class="historial-day-header">
+        <span class="historial-date">{{ dia.fecha|date:"l j \d\e F" }}</span>
+        <span class="historial-pct {% if dia.porcentaje == 100 %}full{% elif dia.porcentaje > 0 %}partial{% else %}empty{% endif %}">
+          {{ dia.completados }}/{{ dia.total }} &mdash; {{ dia.porcentaje }}%
+        </span>
+      </div>
+      {% if dia.registros %}
+        <div class="historial-habits">
+          {% for registro in dia.registros %}
+            <span class="tag-habit {% if registro.completado %}done{% else %}pending{% endif %}">
+              {{ registro.habito.nombre }}
+            </span>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div style="padding:0.75rem 1.25rem;color:var(--color-muted);font-size:0.85rem;">
+          Sin registros para este dia.
+        </div>
+      {% endif %}
+    </div>
+  {% endfor %}
+
+</div>
+{% endblock %}

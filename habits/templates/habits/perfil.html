@@ -1,0 +1,63 @@
+{% extends 'habits/base.html' %}
+
+{% block title %}Mi perfil - Habitum{% endblock %}
+
+{% block content %}
+<div class="main-content">
+
+  <div class="page-header">
+    <h1 class="page-title">Mi perfil</h1>
+    <a href="{% url 'dashboard' %}" class="btn-ghost">Volver</a>
+  </div>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert-habitum {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="perfil-card">
+    <div class="perfil-header">
+      {% if perfil.foto %}
+        <img src="{{ perfil.foto.url }}" alt="foto de perfil" class="avatar-xl" />
+      {% else %}
+        <img src="https://api.dicebear.com/7.x/initials/svg?seed={{ request.user.username }}&backgroundColor=2d5016&textColor=ffffff&radius=50"
+             alt="avatar" class="avatar-xl" />
+      {% endif %}
+      <div>
+        <p class="perfil-username">@{{ request.user.username }}</p>
+        <p class="perfil-nombre">{{ perfil.get_nombre }}</p>
+        <p style="font-size:0.8rem;color:var(--color-muted);margin:0;">
+          Miembro desde {{ request.user.date_joined|date:"F Y" }}
+        </p>
+      </div>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" novalidate>
+      {% csrf_token %}
+      {% for field in form %}
+        <div class="mb-4">
+          <label class="form-label">{{ field.label }}</label>
+          {{ field }}
+          {% if field.help_text %}
+            <div style="font-size:0.78rem;color:var(--color-muted);margin-top:0.25rem;">{{ field.help_text }}</div>
+          {% endif %}
+          {% if field.errors %}
+            {% for error in field.errors %}
+              <div style="color:var(--color-danger);font-size:0.8rem;margin-top:0.25rem;">{{ error }}</div>
+            {% endfor %}
+          {% endif %}
+        </div>
+      {% endfor %}
+
+      <div class="d-flex gap-2 align-items-center">
+        <button type="submit" class="btn-primary-h">Guardar cambios</button>
+        <a href="{% url 'dashboard' %}" class="link-muted">Cancelar</a>
+      </div>
+    </form>
+  </div>
+
+</div>
+{% endblock %}

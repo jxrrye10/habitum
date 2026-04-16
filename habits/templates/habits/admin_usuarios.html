@@ -1,0 +1,94 @@
+{% extends 'habits/base.html' %}
+
+{% block title %}Gestion de Usuarios - Habitum Admin{% endblock %}
+
+{% block content %}
+<div class="main-content">
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert-habitum {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="admin-section-header">
+    <div>
+      <h1 class="admin-section-title">Gestion de Usuarios</h1>
+      <p style="margin:0;font-size:0.85rem;color:var(--color-muted);">
+        {{ datos|length }} usuario{% if datos|length != 1 %}s{% endif %} registrado{% if datos|length != 1 %}s{% endif %}
+      </p>
+    </div>
+    <a href="{% url 'dashboard' %}" class="btn-ghost">Volver al dashboard</a>
+  </div>
+
+  {% if datos %}
+    <div class="habits-section-title">Todos los usuarios</div>
+
+    {% for item in datos %}
+      <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.6rem;">
+
+        <a href="{% url 'detalle_usuario' item.usuario.id %}"
+           class="user-row flex-grow-1 {% if item.usuario.is_superuser %}superuser{% endif %}">
+
+          {% if item.perfil.foto %}
+            <img src="{{ item.perfil.foto.url }}" alt="avatar" class="avatar" />
+          {% else %}
+            <img src="https://api.dicebear.com/7.x/initials/svg?seed={{ item.usuario.username }}&backgroundColor=2d5016&textColor=ffffff&radius=50"
+                 alt="avatar" class="avatar" />
+          {% endif %}
+
+          <div class="user-info">
+            <div class="user-name d-flex align-items-center gap-2">
+              {{ item.perfil.get_nombre }}
+              {% if item.usuario.is_superuser %}
+                <span class="superuser-tag">Admin</span>
+              {% endif %}
+            </div>
+            <div class="user-meta">
+              @{{ item.usuario.username }}
+              &middot; {{ item.usuario.email }}
+              &middot; desde {{ item.usuario.date_joined|date:"d/m/Y" }}
+            </div>
+          </div>
+
+          <div class="user-stats">
+            <div class="user-stat">
+              <div class="user-stat-val">{{ item.total_habitos }}</div>
+              <div class="user-stat-lbl">Habitos</div>
+            </div>
+            <div class="user-stat">
+              <div class="user-stat-val">{{ item.completados_hoy }}</div>
+              <div class="user-stat-lbl">Hoy</div>
+            </div>
+            <div class="user-stat">
+              <div class="user-stat-val">{{ item.porcentaje_hoy }}%</div>
+              <div class="user-stat-lbl">Progreso</div>
+            </div>
+          </div>
+        </a>
+
+        {% if not item.usuario.is_superuser %}
+          <a href="{% url 'eliminar_usuario' item.usuario.id %}" class="btn-icon del" title="Eliminar usuario">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"/>
+              <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+              <path d="M10 11v6"/><path d="M14 11v6"/>
+              <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+            </svg>
+          </a>
+        {% endif %}
+
+      </div>
+    {% endfor %}
+
+  {% else %}
+    <div class="empty-state">
+      <div class="empty-state-title">Sin usuarios registrados</div>
+      <p style="margin:0;">Aun no hay usuarios en la plataforma.</p>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

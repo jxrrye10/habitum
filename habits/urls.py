@@ -18,4 +18,12 @@ urlpatterns = [
 
     # Historial
     path('historial/', views.historial, name='historial'),
+
+    # Perfil
+    path('perfil/', views.editar_perfil, name='editar_perfil'),
+
+    # Administracion (solo superusuario)
+    path('administracion/usuarios/', views.lista_usuarios, name='lista_usuarios'),
+    path('administracion/usuarios/<int:user_id>/', views.detalle_usuario, name='detalle_usuario'),
+    path('administracion/usuarios/<int:user_id>/eliminar/', views.eliminar_usuario, name='eliminar_usuario'),
 ]

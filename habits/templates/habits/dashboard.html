@@ -1,4 +1,3 @@
-
 {% extends 'habits/base.html' %}
 {% load static %}
 
@@ -16,9 +15,17 @@
   {% endif %}
 
   <div class="page-header">
-    <div>
-      <h1 class="page-title">Buenos dias, {{ user.username }}.</h1>
-      <p class="page-date">{{ hoy|date:"l j \d\e F \d\e Y" }}</p>
+    <div class="d-flex align-items-center gap-3">
+      {% if perfil.foto %}
+        <img src="{{ perfil.foto.url }}" alt="foto" class="avatar-lg" />
+      {% else %}
+        <img src="https://api.dicebear.com/7.x/initials/svg?seed={{ user.username }}&backgroundColor=2d5016&textColor=ffffff&radius=50"
+             alt="avatar" class="avatar-lg" />
+      {% endif %}
+      <div>
+        <h1 class="page-title">Hola, {{ perfil.get_nombre }}.</h1>
+        <p class="page-date">{{ hoy|date:"l j \d\e F \d\e Y" }}</p>
+      </div>
     </div>
     <a href="{% url 'crear_habito' %}" class="btn-primary-h">+ Nuevo habito</a>
   </div>

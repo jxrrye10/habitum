@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Habito
+from .models import Habito, Perfil
 
 
 class RegistroUsuarioForm(UserCreationForm):
@@ -32,4 +32,23 @@ class HabitoForm(forms.ModelForm):
                 'placeholder': 'Ej: Leer 30 minutos',
                 'autofocus': True,
             })
+        }
+
+
+class PerfilForm(forms.ModelForm):
+    class Meta:
+        model = Perfil
+        fields = ['nombre_personalizado', 'foto']
+        labels = {
+            'nombre_personalizado': 'Nombre para mostrar',
+            'foto': 'Foto de perfil',
+        }
+        widgets = {
+            'nombre_personalizado': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Como quieres que te llamemos',
+            }),
+            'foto': forms.ClearableFileInput(attrs={
+                'class': 'form-control',
+            }),
         }

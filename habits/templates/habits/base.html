@@ -11,23 +11,57 @@
 <body>
 
   {% if user.is_authenticated %}
-  <nav class="navbar-habitum">
-    <div class="container d-flex justify-content-between align-items-center">
-      <a class="navbar-brand-text" href="{% url 'dashboard' %}">Habitum</a>
-      <div class="d-flex align-items-center gap-2">
-        <a href="{% url 'dashboard' %}" class="nav-link-habitum {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">Hoy</a>
-        <a href="{% url 'historial' %}" class="nav-link-habitum {% if request.resolver_match.url_name == 'historial' %}active{% endif %}">Historial</a>
-        <a href="{% url 'crear_habito' %}" class="nav-link-habitum">+ Nuevo</a>
-        <span style="width:1px;height:20px;background:var(--color-border);display:inline-block;margin:0 4px;"></span>
-        <span class="nav-link-habitum" style="cursor:default;color:var(--color-text) !important;">{{ user.username }}</span>
-        <a href="{% url 'logout' %}" class="nav-link-habitum">Salir</a>
+
+    {% if user.is_superuser %}
+    <div class="admin-banner">Panel de Administrador activo</div>
+    {% endif %}
+
+    <nav class="navbar-habitum">
+      <div class="container d-flex justify-content-between align-items-center">
+
+        <a class="navbar-brand-text" href="{% url 'dashboard' %}">Habitum</a>
+
+        <div class="d-flex align-items-center gap-1 flex-wrap">
+          <a href="{% url 'dashboard' %}"
+             class="nav-link-habitum {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+            Hoy
+          </a>
+          <a href="{% url 'historial' %}"
+             class="nav-link-habitum {% if request.resolver_match.url_name == 'historial' %}active{% endif %}">
+            Historial
+          </a>
+          <a href="{% url 'crear_habito' %}" class="nav-link-habitum">+ Nuevo</a>
+
+          {% if user.is_superuser %}
+          <span class="nav-sep"></span>
+          <a href="{% url 'lista_usuarios' %}"
+             class="nav-link-habitum {% if 'lista_usuarios' in request.resolver_match.url_name or 'detalle_usuario' in request.resolver_match.url_name %}active{% endif %}">
+            Usuarios
+          </a>
+          <span class="nav-admin-badge">Admin</span>
+          {% endif %}
+
+          <span class="nav-sep"></span>
+
+          {% if user.perfil.foto %}
+            <img src="{{ user.perfil.foto.url }}" alt="avatar" class="avatar" />
+          {% else %}
+            <img src="https://api.dicebear.com/7.x/initials/svg?seed={{ user.username }}&backgroundColor=2d5016&textColor=ffffff&radius=50"
+                 alt="avatar" class="avatar" />
+          {% endif %}
+
+          <a href="{% url 'editar_perfil' %}"
+             class="nav-link-habitum {% if request.resolver_match.url_name == 'editar_perfil' %}active{% endif %}">
+            {% if user.perfil.nombre_personalizado %}{{ user.perfil.nombre_personalizado }}{% else %}{{ user.username }}{% endif %}
+          </a>
+          <a href="{% url 'logout' %}" class="nav-link-habitum">Salir</a>
+        </div>
+
       </div>
-    </div>
-  </nav>
+    </nav>
   {% endif %}
 
-  {% block content %}
-  {% endblock %}
+  {% block content %}{% endblock %}
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
